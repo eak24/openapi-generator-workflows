@@ -11,3 +11,9 @@ jobs:
       - run: npm install @openapitools/openapi-generator-cli -g
       - run: openapi-generator-cli version-manager set 5.3.1
       - run: npx @openapitools/openapi-generator-cli generate -o . -g python -i https://cad.onshape.com/api/openapi --skip-validate-spec
+      - name: Install python version
+        uses: gabrielfalcao/pyenv-action@v5
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run tests
+        run: pytest .
