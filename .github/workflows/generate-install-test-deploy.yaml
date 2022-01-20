@@ -10,7 +10,7 @@ jobs:
           node-version: '14'
       - run: npm install @openapitools/openapi-generator-cli -g
       - run: openapi-generator-cli version-manager set 5.3.1
-      - run: npx @openapitools/openapi-generator-cli generate -o . -g python -i https://cad.onshape.com/api/openapi --skip-validate-spec
+      - run: npx @openapitools/openapi-generator-cli generate -o . -g python -i https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml --skip-validate-spec
       - name: Install python version
         uses: gabrielfalcao/pyenv-action@v5
       - name: Install dependencies
