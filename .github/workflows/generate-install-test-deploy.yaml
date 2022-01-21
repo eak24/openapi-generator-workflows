@@ -7,6 +7,18 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: onshape-clients
+
+      - name: Cache Generator
+        id: cache-generator
+        uses: actions/cache@v2
+        with:
+          path: prime-numbers
+          key: ${{ runner.os }}-primes
+
+      - name: Generate Prime Numbers
+        if: steps.cache-primes.outputs.cache-hit != 'true'
+        run: /generate-primes.sh -d prime-numbers
+
       - uses: actions/checkout@v2
         with:
           repository: OpenAPITools/openapi-generator
@@ -33,6 +45,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: generated
+      - run: ls -al
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
