@@ -28,7 +28,7 @@ jobs:
     needs: generate
     defaults:
      run:
-      working-directory: ./generated/python
+      working-directory: generated/python
     steps:
       - uses: actions/download-artifact@v2
         with:
