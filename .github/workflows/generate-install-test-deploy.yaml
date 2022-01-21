@@ -40,7 +40,7 @@ jobs:
     needs: generate
     defaults:
      run:
-      working-directory: generated/python
+      working-directory: generated
     steps:
       - uses: actions/download-artifact@v2
         with:
