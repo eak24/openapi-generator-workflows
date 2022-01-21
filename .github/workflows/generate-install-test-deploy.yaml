@@ -1,22 +1,6 @@
 name: build
 on: [push]
-env:
-  MATRIX: "{\"node\":[10, 12, 14]}"
 jobs:
-  job1:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - id: set-matrix
-        run: echo "::set-output name=matrix::$MATRIX"
-  job2:
-    needs: job1
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{fromJSON(needs.job1.outputs.matrix)}}
-    steps:
-      - run: node --version
   generate:
     runs-on: ubuntu-latest
     steps:
