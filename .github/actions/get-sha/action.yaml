@@ -13,5 +13,5 @@ outputs:
   sha:
     description: The resulting SHA.
 runs:
-  using: 'node16'
+  using: 'node12'
   main: 'index.js'
