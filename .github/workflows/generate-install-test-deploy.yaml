@@ -4,17 +4,21 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
+      - uses: ethan92429/Onshape-Python-Client/.github/actions/get-sha@main
+        with:
+          repo: OpenAPITools/openapi-generator
+          branch: master
+      - run: echo ${{ steps.get-sha.outputs.sha }}
       - uses: actions/checkout@v2
         with:
           path: onshape-clients
 
-#      - name: Cache Generator
-#        id: cache-generator
+#      - name: Generator Cache
+#        id: cache-generator-executable
 #        uses: actions/cache@v2
 #        with:
 #          path: prime-numbers
 #          key: ${{ runner.os }}-primes
-#
 #      - name: Generate Prime Numbers
 #        if: steps.cache-primes.outputs.cache-hit != 'true'
 #        run: /generate-primes.sh -d prime-numbers

@@ -1,0 +1,17 @@
+name: get-sha
+description: Get the Git SHA corresponding to the head of a branch.
+inputs:
+  repo:
+    description: The branch to monitor for new SHAs
+    required: true
+    default: master
+  branch:
+    description: The branch to monitor for new SHAs
+    required: true
+    default: master
+outputs:
+  sha:
+    description: The resulting SHA.
+runs:
+  using: 'node16'
+  main: 'index.js'
