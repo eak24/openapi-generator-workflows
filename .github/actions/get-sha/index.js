@@ -1,15 +1,10 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 
 try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('branch');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("sha", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
+  const repo = core.getInput('repo');
+  const branch = core.getInput('branch');
+  const response = await fetch(`https://api.github.com/repos/${repo}/git/ref/heads/${branch}`)
+  core.setOutput("sha", response.json().object.sha);
 } catch (error) {
   core.setFailed(error.message);
 }

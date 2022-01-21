@@ -4,11 +4,13 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - uses: ethan92429/Onshape-Python-Client/.github/actions/get-sha@main
+      - name: Get Sha
+        uses: ethan92429/Onshape-Python-Client/.github/actions/get-sha@main
+        id: get-sha
         with:
           repo: OpenAPITools/openapi-generator
           branch: master
-      - run: echo ${{ steps.get-sha.outputs.sha }}
+      - run: echo "${{ steps.get-sha.outputs.sha }}"
       - uses: actions/checkout@v2
         with:
           path: onshape-clients

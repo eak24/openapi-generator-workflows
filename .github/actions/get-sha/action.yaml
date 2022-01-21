@@ -2,7 +2,7 @@ name: get-sha
 description: Get the Git SHA corresponding to the head of a branch.
 inputs:
   repo:
-    description: The branch to monitor for new SHAs
+    description: The repo.
     required: true
     default: master
   branch:
