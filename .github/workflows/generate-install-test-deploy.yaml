@@ -3,7 +3,7 @@ on: [push]
 env:
   MATRIX: "{\"node\":[10, 12, 14]}"
 jobs:
-  get-openapi:
+  job1:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
