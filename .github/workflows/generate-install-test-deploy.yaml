@@ -34,23 +34,20 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - run: cd generator && mvn -B --no-snapshot-updates clean package -DskipTests=true -Dmaven.javadoc.skip=true -Djacoco.skip=true
-      - run: generator/bin/generate-samples.sh onshape-clients/configs/*
+      - run: generator/bin/generate-samples.sh onshape-clients/configs/* -- -i https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: generated
+          path: generated/
   python:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        env:
-          - generatorName: python
+    defaults:
+     run:
+      working-directory: ./generated/python
     steps:
-      - uses: actions/checkout@v2
-      - name: Generate Client Library w/ the OpenAPITools Generator
-        uses: openapi-generators/openapitools-generator-action@v1.2.0
+      - uses: actions/download-artifact@v2
         with:
-          generator: python
-          config-file: python/openapi-generator-configuration.yaml
-          openapi-url: https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
-          command-args: -o generated/python
-
+          name: generated
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
