@@ -1,4 +1,5 @@
 const core = require('@actions/core');
+import fetch from "node-fetch";
 
 try {
   const repo = core.getInput('repo');
