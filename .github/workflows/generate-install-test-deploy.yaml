@@ -3,7 +3,7 @@ on: [push]
 env:
   MATRIX: "{\"node\":[10, 12, 14]}"
 jobs:
-  job1:
+  get-openapi:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -17,3 +17,10 @@ jobs:
       matrix: ${{fromJSON(needs.job1.outputs.matrix)}}
     steps:
       - run: node --version
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Client Library w/ the OpenAPITools Generator
+        uses: openapi-generators/openapitools-generator-action@v1.2.0
+        with:
+          config-file: openapi-generator-configuration.yaml
