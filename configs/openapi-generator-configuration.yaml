@@ -6,3 +6,4 @@ additionalProperties:
   hideGenerationTimestamp: true
   library: urllib3
 generatorName: python
+outputDir: generated/python
