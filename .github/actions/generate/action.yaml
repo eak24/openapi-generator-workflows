@@ -1,0 +1,13 @@
+name: generate
+description: Generate OpenApi client
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+    - name: Generate Client Library w/ the OpenAPITools Generator
+      uses: openapi-generators/openapitools-generator-action@v1.2.0
+      with:
+        generator: python
+        config-file: python/openapi-generator-configuration.yaml
+        openapi-url: https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
+        command-args: -o generated/python

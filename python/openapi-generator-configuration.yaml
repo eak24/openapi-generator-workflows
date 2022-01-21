@@ -6,5 +6,3 @@ additionalProperties:
   hideGenerationTimestamp: true
   library: urllib3
 generatorName: python
-inputSpec: https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
-outputSpec: python

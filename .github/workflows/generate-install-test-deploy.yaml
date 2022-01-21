@@ -20,7 +20,19 @@ jobs:
   python:
     runs-on: ubuntu-latest
     steps:
+      - uses: ethan92429/Onshape-Python-Client/.github/actions/generate@main
+      - uses: actions/checkout@v2
       - name: Generate Client Library w/ the OpenAPITools Generator
         uses: openapi-generators/openapitools-generator-action@v1.2.0
         with:
-          config-file: openapi-generator-configuration.yaml
+          generator: python
+          config-file: python/openapi-generator-configuration.yaml
+          openapi-url: https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
+          command-args: -o generated/python
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+      - name: Install dependencies
+        run: cd generated/python && pip install -r requirements.txt && pip install -r test-requirements.txt
+      - name: Run tests
+        run: pytest .
