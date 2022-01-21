@@ -8,6 +8,6 @@ runs:
       uses: openapi-generators/openapitools-generator-action@v1.2.0
       with:
         generator: python
-        config-file: python/openapi-generator-configuration.yaml
+        config-file: python/python.yaml
         openapi-url: https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
         command-args: -o generated/python
