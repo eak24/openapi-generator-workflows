@@ -67,6 +67,7 @@ jobs:
         with:
           repository: ethan92429/Python-Onshape-Client
           branch: main
+          github_token: GENERAL_PUSH_TOKEN
   go:
     runs-on: ubuntu-latest
     needs: generate
