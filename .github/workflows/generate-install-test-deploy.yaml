@@ -37,7 +37,10 @@ jobs:
       - run: cd generator && ./mvnw -B --no-snapshot-updates clean package -DskipTests=true -Dmaven.javadoc.skip=true -Djacoco.skip=true
         if: steps.cache-generator.outputs.cache-hit != 'true'
 
-      - run: generator/bin/generate-samples.sh onshape-clients/configs/* -- -i https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - run: python scripts/generate.py https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
       - uses: actions/upload-artifact@v2
         with:
           name: generated
