@@ -4,6 +4,9 @@ import subprocess
 import sys
 
 
+generator_path = 'generator/modules/openapi-generator-cli/target/openapi-generator-cli.jar'
+
+
 def get_configs():
     for root, dirs, files in os.walk(os.getcwd(), topdown=True):
         if 'configs' in dirs:
@@ -15,7 +18,7 @@ def get_configs():
 
 def generate(url):
     print(f"Generating from: {url}")
-    commands = [f"openapi-generator-cli generate -c {config} -i {url}" for config in get_configs()]
+    commands = [f"java -jar {generator_path} generate -c {config} -i {url}" for config in get_configs()]
     configs = get_configs()
     print(f'Generating files: {configs}')
     processes = []

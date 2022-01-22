@@ -40,7 +40,6 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - run: alias openapi-generator-cli='generator/modules/openapi-generator-cli/target/openapi-generator-cli.jar'
       - run: python onshape-clients/scripts/generate.py https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/modules/openapi-generator/src/test/resources/3_0/petstore.yaml
       - uses: actions/upload-artifact@v2
         with:
