@@ -1,0 +1,41 @@
+name: get-openapi
+description: Get an OpenApi spec, save to file, and output object.
+inputs:
+  openapi-url:
+    required: true
+    description: The url to the OpenApi spec.
+  file-name:
+    required: false
+    description: For saving the file.
+    default: openapi.json
+  username:
+    required: false
+    description: For Basic Authentication.
+  password:
+    required: false
+    description: For Basic Authentication.
+outputs:
+  openapi:
+    description: The parsed openapi object.
+    value: ${{ steps.parse-json.outputs.json-object }}
+  version:
+    description: The version of the openapi object.
+    value: ${{ steps.set-version.outputs.version }}
+runs:
+  using: composite
+  steps:
+      - uses: ethan92429/download-file-action@v1.2.0
+        id: get-file
+        with:
+          file-url: ${{ inputs.openapi-url }}
+          file-name: openapi.json
+          authentication: Basic
+          username: ${{ inputs.username }}
+          password: ${{ inputs.password }}
+      - id: parse-json
+        uses: ethan92429/onshape-generator/.github/actions/parse-json-file@master
+        with:
+          file-path: ${{ steps.get-file.outputs.file-path }}
+      - id: set-version
+        run: echo "::set-output name=version::${{ steps.parse-json.outputs.json-object.info.version }}"
+        shell: /bin/bash

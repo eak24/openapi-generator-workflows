@@ -1,0 +1,26 @@
+name: parse-json-file-file
+description: Generate OpenApi client
+inputs:
+  file-path:
+    required: true
+    description: The file path to the JSON file.
+outputs:
+  json-object:
+    description: "The parsed JSON object"
+    value: ${{ steps.set-json-object.outputs.json-object }}
+runs:
+  using: composite
+  steps:
+    - id: set-json-var
+      shell: /bin/bash
+      run: |
+        content=`cat ${{ inputs.file-path }}`
+        # the following lines are only required for multi line json
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+        # end of optional handling for multi line json
+        echo "::set-output name=jsonContent::$content"
+    - id: set-json-object
+      shell: /bin/bash
+      run: echo '::set-output name=json-object::${{ fromJson(steps.set-json-var.outputs.jsonContent) }}'

@@ -1,0 +1,37 @@
+name: dispatch-generator-jobs
+on:
+  workflow_dispatch:
+    openapi-url:
+      description: The OpenApi spec url to send to the various generator repos.
+env:
+  OPENAPI_URL: ${{ github.event.inputs.openapi-url }}
+jobs:
+  get-dispatch-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ethan92429/download-file-action@v1.2.0
+        id: get-file
+        with:
+          file-url: ${{ env.OPENAPI_URL }}
+          file-name: openapi.json
+          authentication: Basic
+          username: ${{ env.USERNAME }}
+          password: ${{ env.PASSWORD }}
+      - id: set-matrix
+        run: echo '::set-output name=MATRIX::$(python scripts/environment_matrix.py )'
+    outputs:
+      matrix: ${{ toJson(steps.set-matrix.) }}
+  dispatch:
+    runs-on: ubuntu-latest
+    needs:
+      - get-dispatch-matrix
+    strategy:
+      matrix:
+        env:
+          - GENERATOR_REPO: ${{ needs.build-and-publish.outputs.x-openapi-generator.generatorRepos }}
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          event-type: my-event
