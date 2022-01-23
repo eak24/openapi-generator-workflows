@@ -7,7 +7,7 @@ on:
 env:
   ONSHAPE_API_URL: https://cad.onshape.com/api
 jobs:
-  generate:
+  get-file:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -52,9 +52,11 @@ jobs:
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "Add changes" -a
+          git add openapi.json
+          git commit -m "OpenApi ${{ steps.set-version.outputs.version }}" -a
           git tag -a ${{ steps.set-version.outputs.version }} -m "Version ${{ steps.set-version.outputs.version }} from ${{ env.OPENAPI_URL }}"
       - name: Deploy
         uses: ad-m/github-push-action@v0.6.0
         with:
           branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
