@@ -21,8 +21,6 @@ jobs:
         id: get-openapi
         with:
           openapi-url: ${{ env.OPENAPI_URL }}
-          file-name: openapi.json
-          authentication: Basic
           username: ${{ env.USERNAME }}
           password: ${{ env.PASSWORD }}
       - id: set-matrix

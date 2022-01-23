@@ -1,0 +1,12 @@
+name: test-openapi-generator-workflows
+on: [push]
+jobs:
+  test-parse-json-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: parse-json-file
+        uses: ethan92429/onshape-generator/.github/actions/parse-json-file@main
+        with:
+          file-path: tests/test-data/test-json.json
+      - run: python -c "exit(not '${{ steps.parse-json-file.outputs.json-object.inner_object.a_key }}' == 'a_value')"

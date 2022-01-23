@@ -21,6 +21,8 @@ runs:
         content="${content//$'\r'/'%0D'}"
         # end of optional handling for multi line json
         echo "::set-output name=jsonContent::$content"
+        echo $content
+        cat ${{ inputs.file-path }}
     - id: set-json-object
       shell: bash
       run: echo '::set-output name=json-object::${{ fromJson(steps.set-json-var.outputs.jsonContent) }}'
