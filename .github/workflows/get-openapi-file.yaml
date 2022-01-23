@@ -1,28 +1,30 @@
 name: get-openapi
 on:
   workflow_dispatch:
-    openapi-url:
-      description: The URL to download from.
-    username:
-      description: Username for basic authentication when fetching the spec.
-    password:
-      description: Password for basic authentication when fetching the spec.
+    inputs:
+      openapi-url:
+        required: true
+        description: The URL to download from.
+      username:
+        required: false
+        description: Username for basic authentication when fetching the spec.
+      password:
+        required: false
+        description: Password for basic authentication when fetching the spec.
 env:
   OPENAPI_URL: ${{ github.event.inputs.openapi-url }}
   USERNAME: ${{ github.event.inputs.username }}
   PASSWORD: ${{ github.event.inputs.password }}
   VERSION: Undefined
 jobs:
-  get-file:
+  get-openapi:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ethan92429/onshape-generator/.github/actions/get-openapi@master
+      - uses: ethan92429/onshape-generator/.github/actions/get-openapi@main
         id: get-openapi
         with:
-          file-url: ${{ env.OPENAPI_URL }}
-          file-name: openapi.json
-          authentication: Basic
+          openapi-url: ${{ env.OPENAPI_URL }}
           username: ${{ env.USERNAME }}
           password: ${{ env.PASSWORD }}
       - name: Commit files

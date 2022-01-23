@@ -1,8 +1,16 @@
 name: dispatch-generator-jobs
 on:
   workflow_dispatch:
-    openapi-url:
-      description: The OpenApi spec url to send to the various generator repos.
+    inputs:
+      openapi-url:
+        required: true
+        description: The OpenApi spec url to send to the various generator repos.
+      username:
+        required: false
+        description: Username for basic authentication when fetching the spec.
+      password:
+        required: false
+        description: Password for basic authentication when fetching the spec.
 env:
   OPENAPI_URL: ${{ github.event.inputs.openapi-url }}
 jobs:

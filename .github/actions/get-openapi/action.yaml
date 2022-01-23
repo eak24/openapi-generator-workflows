@@ -33,7 +33,7 @@ runs:
           username: ${{ inputs.username }}
           password: ${{ inputs.password }}
       - id: parse-json
-        uses: ethan92429/onshape-generator/.github/actions/parse-json-file@master
+        uses: ethan92429/onshape-generator/.github/actions/parse-json-file@main
         with:
           file-path: ${{ steps.get-file.outputs.file-path }}
       - id: set-version
