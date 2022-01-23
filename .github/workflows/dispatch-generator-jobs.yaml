@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: ethan92429/download-file-action@v1.2.0
-        id: get-file
+        id: get-openapi
         with:
-          file-url: ${{ env.OPENAPI_URL }}
+          openapi-url: ${{ env.OPENAPI_URL }}
           file-name: openapi.json
           authentication: Basic
           username: ${{ env.USERNAME }}
