@@ -1,0 +1,60 @@
+name: get-openapi
+on:
+  schedule:
+    # Runs "at minute 55 past every hour" (see https://crontab.guru)
+    - cron: '55 * * * *'
+  workflow_dispatch:
+env:
+  ONSHAPE_API_URL: https://cad.onshape.com/api
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+#      - uses: ethan92429/download-file-action@v1.2.0
+#        id: get-build
+#        with:
+#          file-url: ${{ env.ONSHAPE_API }}/build
+#          file-name: build.json
+#      - id: set-build-json-var
+#        run: |
+#          content=`cat ${{ steps.get-build.outputs.file-path }}`
+#          # the following lines are only required for multi line json
+#          content="${content//'%'/'%25'}"
+#          content="${content//$'\n'/'%0A'}"
+#          content="${content//$'\r'/'%0D'}"
+#          # end of optional handling for multi line json
+#          echo "::set-output name=buildContent::$content"
+#      - id: set-buildVersion
+#        run: echo '::set-output name=buildVersion::${{fromJson(steps.set-build-json-var.outputs.buildContent)["Implementation-Version"]}}'
+#      - run: git tag | grep ${{ steps.set-buildVersion.outputs.version }}
+      - uses: ethan92429/download-file-action@v1.2.0
+        id: get-file
+        with:
+          file-url: ${{ env.ONSHAPE_API_URL }}/openapi
+          file-name: openapi.json
+          authentication: Basic
+          username: ${{ env.ONSHAPE_API_KEY }}
+          password: ${{ env.ONSHAPE_API_SECRET }}
+      - id: set-json-var
+        run: |
+          content=`cat ${{ steps.get-file.outputs.file-path }}`
+          # the following lines are only required for multi line json
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          # end of optional handling for multi line json
+          echo "::set-output name=openapiContent::$content"
+      - id: set-version
+        run: echo '::set-output name=version::${{fromJson(steps.set-json-var.outputs.openapiContent).info.version}}'
+#      - run: ! git tag | grep ${{ steps.set-version.outputs.version }}
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "Add changes" -a
+          git tag -a ${{ steps.set-version.outputs.version }} -m "Version ${{ steps.set-version.outputs.version }} from ${{ env.OPENAPI_URL }}"
+      - name: Deploy
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          branch: main
