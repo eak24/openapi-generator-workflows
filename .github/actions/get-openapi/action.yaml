@@ -1,5 +1,5 @@
 name: get-openapi
-description: Get an OpenApi spec, save to file, and output object.
+description: Get an OpenApi spec, save to file, and output the version and dispatch requests.
 inputs:
   openapi-url:
     required: true
@@ -15,9 +15,9 @@ inputs:
     required: false
     description: For Basic Authentication.
 outputs:
-  openapi:
-    description: The parsed openapi object.
-    value: ${{ steps.parse-json.outputs.json-object }}
+  x-openapi-generator:
+    description: The x-openapi-generator json string.
+    value: ${{ steps.set-extension-string.outputs.extension }}
   version:
     description: The version of the openapi object.
     value: ${{ steps.set-version.outputs.version }}
@@ -37,5 +37,16 @@ runs:
         with:
           file-path: ${{ steps.get-file.outputs.file-path }}
       - id: set-version
-        run: echo "::set-output name=version::${{ steps.parse-json.outputs.json-object.info.version }}"
+        run: echo "::set-output name=version::${{ fromJson(steps.parse-json.outputs.json).info.version }}"
+        shell: bash
+      - id: set-extension-string
+        run: |
+          content=$(cat << EOF
+          ${{ toJson(fromJson(steps.parse-json.outputs.json).info.x-openapi-generator) }}
+          EOF
+          )
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "::set-output name=extension::$content"
         shell: bash

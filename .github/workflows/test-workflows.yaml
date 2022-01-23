@@ -9,4 +9,15 @@ jobs:
         uses: ethan92429/onshape-generator/.github/actions/parse-json-file@main
         with:
           file-path: tests/test-data/test-json.json
-      - run: python -c "exit(not '${{ steps.parse-json-file.outputs.json-object.inner_object.a_key }}' == 'a_value')"
+      - run: python -c "exit(not '${{ fromJson(steps.parse-json-file.outputs.json).inner_object.a_key }}' == 'a_value')"
+  test-get-openapi-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: get-openapi
+        uses: ethan92429/onshape-generator/.github/actions/get-openapi@main
+        with:
+          openapi-url: https://raw.githubusercontent.com/ethan92429/openapi-generator-workflows/main/tests/test-data/test-openapi.json
+      - run: python -c "exit(not '${{ steps.get-openapi.outputs.version }}' == '1.1.1')"
+      - run: echo '${{ steps.get-openapi.outputs.x-openapi-generator }}'
+      - run: python -c "exit(not '${{ fromJson(steps.get-openapi.outputs.x-openapi-generator).dispatch-repos[0] }}' == 'first-repo')"
