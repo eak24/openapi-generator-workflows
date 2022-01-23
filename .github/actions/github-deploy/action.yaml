@@ -1,0 +1,39 @@
+name: get-openapi
+description: Get an OpenApi spec, save to file, and output the version and dispatch requests.
+inputs:
+  DEPLOY_REPO_TOKEN:
+    description: The authentication token needed to access the openapi.
+    required: true
+  deploy_type:
+    required: false
+    default:
+runs:
+  using: composite
+  steps:
+      - uses: ethan92429/download-file-action@v1.2.0
+        id: get-file
+        with:
+          file-url: ${{ inputs.openapi-url }}
+          file-name: openapi.json
+          authentication: Basic
+          username: ${{ inputs.username }}
+          password: ${{ inputs.password }}
+          token: ${{ inputs.token }}
+      - id: parse-json
+        uses: ethan92429/onshape-generator/.github/actions/parse-json-file@main
+        with:
+          file-path: ${{ steps.get-file.outputs.file-path }}
+      - id: set-version
+        run: echo "::set-output name=version::${{ fromJson(steps.parse-json.outputs.json).info.version }}"
+        shell: bash
+      - id: set-extension-string
+        run: |
+          content=$(cat << EOF
+          ${{ toJson(fromJson(steps.parse-json.outputs.json).info.x-openapi-generator) }}
+          EOF
+          )
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "::set-output name=extension::$content"
+        shell: bash

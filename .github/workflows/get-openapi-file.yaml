@@ -1,10 +1,12 @@
 name: get-openapi
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       openapi-url:
         required: true
+        type: string
         description: The URL to download from.
+    secrets:
       username:
         required: false
         description: Username for basic authentication when fetching the spec.
@@ -12,30 +14,30 @@ on:
         required: false
         description: Password for basic authentication when fetching the spec.
 env:
-  OPENAPI_URL: ${{ github.event.inputs.openapi-url }}
-  USERNAME: ${{ github.event.inputs.username }}
-  PASSWORD: ${{ github.event.inputs.password }}
+  OPENAPI_URL: ${{ inputs.openapi-url }}
   VERSION: Undefined
 jobs:
   get-openapi:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ethan92429/onshape-generator/.github/actions/get-openapi@main
+      - uses: ethan92429/openapi-generator-workflows/.github/actions/get-openapi@main
         id: get-openapi
         with:
           openapi-url: ${{ env.OPENAPI_URL }}
-          username: ${{ env.USERNAME }}
-          password: ${{ env.PASSWORD }}
-      - name: Commit files
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          authentication: Basic
+      - name: Prettify Json
         run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add openapi.json
-          git commit -m "OpenApi ${{ steps.get-openapi.outputs.version }}" -a
-          git tag -a ${{ steps.get-openapi.outputs.version }} -m "Version ${{ steps.get-openapi.outputs.version }} from ${{ env.OPENAPI_URL }}"
-      - name: Deploy
-        uses: ad-m/github-push-action@v0.6.0
+          python -m json.tool openapi.json > pretty_openapi.json
+          mv pretty_openapi.json openapi.json
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
         with:
-          branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.get-openapi.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          delete-branch: true
+          commit-message: Update to version ${{ steps.get-openapi.outputs.version }}.
+          title: Version ${{ steps.get-openapi.outputs.version }}
+          body: The automatically generated changes created by OpenApi Generator for the update to version ${{ steps.get-openapi.outputs.version }}.

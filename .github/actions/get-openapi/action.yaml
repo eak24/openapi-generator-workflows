@@ -1,5 +1,5 @@
 name: get-openapi
-description: Get an OpenApi spec, save to file, and output object.
+description: Get an OpenApi spec, save to file, and output the version and dispatch requests.
 inputs:
   openapi-url:
     required: true
@@ -14,28 +14,32 @@ inputs:
   password:
     required: false
     description: For Basic Authentication.
+  token:
+    required: false
+    description: For Token Authentication.
+  authentication:
+    required: false
+    description: Token, Basic or None Authentication types.
 outputs:
-  openapi:
-    description: The parsed openapi object.
-    value: ${{ steps.parse-json.outputs.json-object }}
+  x-openapi-generator:
+    description: The x-openapi-generator json string.
+    value: ${{ steps.set-extension-string.outputs.extension }}
   version:
     description: The version of the openapi object.
     value: ${{ steps.set-version.outputs.version }}
 runs:
   using: composite
   steps:
-      - uses: ethan92429/download-file-action@v1.2.0
+      - uses: ethan92429/download-file-action@master
         id: get-file
         with:
           file-url: ${{ inputs.openapi-url }}
           file-name: openapi.json
-          authentication: Basic
+          authentication: ${{ inputs.authentication }}
           username: ${{ inputs.username }}
           password: ${{ inputs.password }}
-      - id: parse-json
-        uses: ethan92429/onshape-generator/.github/actions/parse-json-file@main
-        with:
-          file-path: ${{ steps.get-file.outputs.file-path }}
-      - id: set-version
-        run: echo "::set-output name=version::${{ steps.parse-json.outputs.json-object.info.version }}"
+          token: ${{ inputs.token }}
+      - name: Set version based on the file config.
+        run: |
+          echo ::set-output name=version::`perl -lne 'print $1 if /version": "([\w|.|-]+)/' < openapi-config.yaml`
         shell: bash

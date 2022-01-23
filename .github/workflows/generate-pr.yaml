@@ -1,0 +1,63 @@
+name: generate-pr
+on:
+  workflow_call:
+    inputs:
+      openapi-url:
+        type: string
+        description: The URL of the OpenApi spec to generate from.
+        required: true
+      command-args:
+        type: string
+        required: false
+        description: Extra command arguments for the OpenApi generate step.
+    secrets:
+      DEPLOY_REPO_TOKEN:
+        description: The authentication token needed to access the openapi.
+        required: true
+jobs:
+  generate-install-test-deploy:
+    runs-on: ubuntu-latest
+    env:
+      OPENAPI_URL: ${{ inputs.openapi-url }}
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.REPOSITORY }}
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+      - name: Set GENERATOR_NAME based on the file config.
+        run: |
+          echo GENERATOR_NAME=`perl -lne 'print $1 if /generatorName: (\w+)/' < openapi-config.yaml` >> $GITHUB_ENV
+      - uses: ethan92429/openapi-generator-workflows/.github/actions/get-openapi@main
+        id: download-openapi
+        with:
+          openapi-url: ${{ env.OPENAPI_URL }}
+          file-name: openapi.json
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          authentication: Token
+      - name: Generate Client
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: ${{ env.GENERATOR_NAME }}
+          config-file: openapi-config.yaml
+          openapi-file: openapi.json
+          generator-tag: latest
+          command-args: -o . --skip-validate-spec ${{ inputs.command-args }}
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: ${{ steps.download-openapi.outputs.version }}
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          delete-branch: true
+          commit-message: Update to version ${{ steps.download-openapi.outputs.version }}.
+          title: Version ${{ steps.download-openapi.outputs.version }}
+          body: The automatically generated changes created by OpenApi Generator.
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v1
+        with:
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash

@@ -5,9 +5,9 @@ inputs:
     required: true
     description: The file path to the JSON file.
 outputs:
-  json-object:
-    description: "The parsed JSON object"
-    value: ${{ steps.set-json-object.outputs.json-object }}
+  json:
+    description: "The JSON string"
+    value: ${{ steps.set-json-var.outputs.jsonContent }}
 runs:
   using: composite
   steps:
@@ -21,8 +21,3 @@ runs:
         content="${content//$'\r'/'%0D'}"
         # end of optional handling for multi line json
         echo "::set-output name=jsonContent::$content"
-        echo $content
-        cat ${{ inputs.file-path }}
-    - id: set-json-object
-      shell: bash
-      run: echo '::set-output name=json-object::${{ fromJson(steps.set-json-var.outputs.jsonContent) }}'
