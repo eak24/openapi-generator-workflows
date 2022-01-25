@@ -6,6 +6,11 @@ on:
         required: true
         type: string
         description: The URL to download from.
+      post-process-file:
+        required: false
+        type: string
+        default: postprocess.json
+        description: The configuration for any file postprocessing needed.
     secrets:
       username:
         required: false
@@ -28,10 +33,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           authentication: Basic
-      - name: Prettify Json
-        run: |
-          python -m json.tool openapi.json > pretty_openapi.json
-          mv pretty_openapi.json openapi.json
       - name: Download PostProcessor Code
         uses: ethan92429/download-file-action@master
         with:
@@ -39,7 +40,12 @@ jobs:
           location: ../scripts
       - name: PostProcess Json
         run: |
-          python -m ../scripts/postprocess.py openapi.json postprocess_config.json
+          python ../scripts/postprocess.py openapi.json ${{ inputs.post-process-file }} openapi-processed.json
+          mv openapi-processed.json openapi.json
+      - name: Prettify Json
+        run: |
+          python -m json.tool openapi.json > pretty_openapi.json
+          mv pretty_openapi.json openapi.json
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:

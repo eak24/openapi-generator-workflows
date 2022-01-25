@@ -1,4 +1,4 @@
-name: generate-pr
+name: test-python
 on: [workflow_call]
 jobs:
   test-python:

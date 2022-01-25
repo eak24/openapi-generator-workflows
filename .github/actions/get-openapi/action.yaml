@@ -40,6 +40,7 @@ runs:
           password: ${{ inputs.password }}
           token: ${{ inputs.token }}
       - name: Set version based on the file config.
+        id: set-version
         run: |
-          echo ::set-output name=version::`perl -lne 'print $1 if /version": "([\w|.|-]+)/' < openapi-config.yaml`
+          echo ::set-output name=version::`perl -lne 'print $1 if /version":[ ]*"([\w|.|-]+)/' < openapi.json`
         shell: bash
