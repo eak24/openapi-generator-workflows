@@ -32,6 +32,14 @@ jobs:
         run: |
           python -m json.tool openapi.json > pretty_openapi.json
           mv pretty_openapi.json openapi.json
+      - name: Download PostProcessor Code
+        uses: ethan92429/download-file-action@master
+        with:
+          file-url: https://raw.githubusercontent.com/ethan92429/openapi-generator-workflows/main/scripts/postprocess.py
+          location: ../scripts
+      - name: PostProcess Json
+        run: |
+          python -m ../scripts/postprocess.py openapi.json postprocess_config.json
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:

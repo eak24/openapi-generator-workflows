@@ -15,7 +15,7 @@ on:
         description: The authentication token needed to access the openapi.
         required: true
 jobs:
-  generate-install-test-deploy:
+  generate-pr:
     runs-on: ubuntu-latest
     env:
       OPENAPI_URL: ${{ inputs.openapi-url }}

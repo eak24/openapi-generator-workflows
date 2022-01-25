@@ -1,0 +1,1 @@
+{"paths": {"/ping": {"get": {"operationId": "pingGet"}}}}
