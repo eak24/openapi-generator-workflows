@@ -24,6 +24,11 @@ env:
 jobs:
   get-openapi:
     runs-on: ubuntu-latest
+#    services:
+#      swagger-editor:
+#        image: swaggerapi/swagger-editor
+#        ports:
+#          - 80:8080
     steps:
       - uses: actions/checkout@v2
       - uses: ethan92429/openapi-generator-workflows/.github/actions/get-openapi@main
@@ -42,11 +47,28 @@ jobs:
         run: |
           python ../scripts/postprocess.py openapi.json ${{ inputs.post-process-file }} openapi-processed.json
           mv openapi-processed.json openapi.json
+      - name: Validate OpenApi
+        uses: ethan92429/setup-openapi-generator-cli@v1
+      - run: openapi-generator-cli validate -i openapi.json --recommend
+      # Skip for now because of timeout error...
+      - name: Validate OpenAPI definition
+        uses: ethan92429/swagger-editor-validate@set_timeout
+        if: ${{ false }}
+        with:
+          swagger-editor-url: http://localhost/
+          definition-file: openapi.json
+          timeout: 100
+      - name: Validate Diff Works
+        run: |
+          docker run --rm -t \
+            -v $(pwd):/specs:ro \
+            openapitools/openapi-diff:latest /specs/openapi.json /specs/openapi.json
       - name: Prettify Json
         run: |
           python -m json.tool openapi.json > pretty_openapi.json
           mv pretty_openapi.json openapi.json
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v3
         with:
           branch: ${{ steps.get-openapi.outputs.version }}
@@ -55,3 +77,10 @@ jobs:
           commit-message: Update to version ${{ steps.get-openapi.outputs.version }}.
           title: Version ${{ steps.get-openapi.outputs.version }}
           body: The automatically generated changes created by OpenApi Generator for the update to version ${{ steps.get-openapi.outputs.version }}.
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash

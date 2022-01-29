@@ -21,6 +21,8 @@ jobs:
       OPENAPI_URL: ${{ inputs.openapi-url }}
       REPOSITORY: ${{ github.repository }}
     steps:
+      - name: Add `openapi-generator-cli` to path
+        uses: ethan92429/setup-openapi-generator-cli@v1
       - name: Checkout
         uses: actions/checkout@v2
         with:
