@@ -27,6 +27,9 @@ outputs:
   version:
     description: The version of the openapi object.
     value: ${{ steps.set-version.outputs.version }}
+  file-path:
+    description: Location of the downloaded openapi spec.
+    value: ${{ steps.get-file.outputs.file-path }}
 runs:
   using: composite
   steps:
