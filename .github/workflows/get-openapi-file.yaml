@@ -43,7 +43,13 @@ jobs:
         with:
           file-url: https://raw.githubusercontent.com/ethan92429/openapi-generator-workflows/main/scripts/postprocess.py
           location: ../scripts
+      - name: Check postprocess file existence
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: ${{ inputs.post-process-file }}
       - name: PostProcess Json
+        if: steps.check_files.outputs.files_exists == 'true'
         run: |
           python ../scripts/postprocess.py openapi.json ${{ inputs.post-process-file }} openapi-processed.json
           mv openapi-processed.json openapi.json
