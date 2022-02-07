@@ -20,6 +20,10 @@ inputs:
   authentication:
     required: false
     description: Token, Basic or None Authentication types.
+  location:
+    required: false
+    description: File location.
+    default: .
 outputs:
   x-openapi-generator:
     description: The x-openapi-generator json string.
@@ -37,13 +41,14 @@ runs:
         id: get-file
         with:
           file-url: ${{ inputs.openapi-url }}
-          file-name: openapi.json
+          file-name: ${{ inputs.file-name }}
           authentication: ${{ inputs.authentication }}
           username: ${{ inputs.username }}
           password: ${{ inputs.password }}
           token: ${{ inputs.token }}
+          location: ${{ inputs.location }}
       - name: Set version based on the file config.
         id: set-version
         run: |
-          echo ::set-output name=version::`perl -lne 'print $1 if /version":[ ]*"([\w|.|-]+)/' < openapi.json`
+          echo ::set-output name=version::`perl -lne 'print $1 if /version":[ ]*"([\w|.|-]+)/' < ${{ steps.get-file.outputs.file-path }}`
         shell: bash

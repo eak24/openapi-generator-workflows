@@ -12,7 +12,10 @@ on:
         description: Extra command arguments for the OpenApi generate step.
     secrets:
       DEPLOY_REPO_TOKEN:
-        description: The authentication token needed to access the openapi.
+        description: The authentication token needed to create the PR in the deploy repo.
+        required: false
+      OPENAPI_ACCESS_TOKEN:
+        description: The token needed to access the OpenApi specification.
         required: false
 jobs:
   generate-pr:
@@ -35,16 +38,14 @@ jobs:
         with:
           openapi-url: ${{ env.OPENAPI_URL }}
           file-name: openapi.json
-          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          token: ${{ secrets.OPENAPI_ACCESS_TOKEN }}
           authentication: Token
+      - name: Install the OpenAPITools Generator CLI
+        uses: eak24/setup-openapi-generator-cli@v1
       - name: Generate Client
-        uses: openapi-generators/openapitools-generator-action@v1
-        with:
-          generator: ${{ env.GENERATOR_NAME }}
-          config-file: openapi-config.yaml
-          openapi-file: openapi.json
-          generator-tag: latest
-          command-args: -o . --skip-validate-spec ${{ inputs.command-args }}
+        run: openapi-generator-cli generate -g ${{ env.GENERATOR_NAME }} -c openapi-config.yaml -i openapi.json -o . --skip-validate-spec ${{ inputs.command-args }}
+      - name: Cleanup OpenApi.
+        run: rm openapi.json
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3
